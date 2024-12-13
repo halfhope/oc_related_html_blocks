@@ -1,0 +1,188 @@
+{{ header }}{{ column_left }}
+<div id="content">
+<style>
+html {
+	overflow-y: scroll;
+}
+.input-code {
+	min-height: 250px;
+}
+.btn-divider {
+	display: inline-block;
+	width: 1px;
+	padding: 7px 0px;
+	margin: 0px 5px;
+	background: #cdcdcd;
+	border: none;
+}
+.form-group .ui-switcher {
+	margin-top: 9px;
+}
+</style>
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="pull-right">
+				<button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+				<a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+				<span type="button" class="btn-divider">&nbsp;</span>
+				<div class="btn-group" data-toggle="tooltip" title="{{ button_modules }}">
+					<a href="{{ modules_link }}" type="button" class="btn btn-success">{{ button_modules }}</a>
+					<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+						<span class="caret"></span>
+						<span class="sr-only">Toggle Dropdown</span>
+					</button>
+					<ul class="dropdown-menu dropdown-menu-right">
+						<li><a href="{{ add_module }}">{{ button_add }}</a></li>
+						{% if (modules is not empty) %}
+						<li role="separator" class="divider"></li>
+						<li class="dropdown-header">{{ button_modules }}</li>
+						{% for module in modules %}
+						<li><a href="{{ module.edit }}">{{ module.name }}</a></li>
+						{% endfor %}
+						{% endif %}
+					</ul>
+				</div>
+				<div class="btn-group" data-toggle="tooltip" title="{{ text_list }}">
+					<a href="{{ list }}" type="button" class="btn btn-success">{{ text_list }}</a>
+					<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+						<span class="caret"></span>
+						<span class="sr-only">Toggle Dropdown</span>
+					</button>
+					<ul class="dropdown-menu dropdown-menu-right">
+						<li><a href="{{ add_block }}">{{ button_add }}</a></li>
+						{% if (htmls_top is not empty) %}
+						<li role="separator" class="divider"></li>
+						<li class="dropdown-header">{{ text_list }}</li>
+						{% for html in htmls_top %}
+						<li><a href="{{ html.edit }}">{{ html.name }}</a></li>
+						{% endfor %}
+						{% endif %}
+					</ul>
+				</div>
+			</div>
+			<h1>{{ heading_title }}</h1>
+			<ul class="breadcrumb">
+				{% for breadcrumb in breadcrumbs %}
+				<li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="container-fluid">
+		{% if error_warning %}
+		<div class="alert alert-danger alert-dismissible" data-countdown><i class="fa fa-exclamation-circle"></i> <span class="countdown">[2]</span> {{ error_warning }}
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+		{% endif %}
+		{% if success %}
+		<div class="alert alert-success alert-dismissible" data-countdown><i class="fa fa-check-circle"></i> <span class="countdown">[2]</span> {{ success }}
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+		{% endif %}
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_form }}</h3><h3 class="panel-title pull-right">v{{ version }}</h3>
+			</div>
+			<div class="panel-body">
+				<form action="{{ save }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+					
+					<div class="form-group required">
+						<label class="col-sm-2 control-label" for="input-name">{{ entry_name }}</label>
+						<div class="col-sm-10">
+							<input type="text" name="name" id="input-name" class="form-control" value="{{ name }}" placeholder="{{ entry_name }}">
+							{% if error_name %}
+								<div class="text-danger">{{ error_name }}</div>
+							{% endif %}
+						</div>
+					</div>
+				
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+						<div class="col-sm-10">
+							<input type="checkbox" class="switcher ui-switcher form-control" data-target="hidden-status" {{ (status == 1) ? 'checked' : '' }}>
+							<input type="hidden" id="hidden-status" name="status" value="{{ status }}">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-sort-order">{{ entry_sort_order }}</label>
+						<div class="col-sm-10">
+							<input type="text" name="sort_order" id="input-sort-order" class="form-control" value="{{ sort_order }}" placeholder="{{ entry_sort_order }}">
+						</div>
+					</div>
+
+					<ul class="nav nav-tabs" id="language">
+						{% for language in languages %}
+						<li><a href="#language{{ language.language_id }}" data-toggle="tab"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /> {{ language.name }}</a></li>
+						{% endfor %}
+			  		</ul>
+
+			  		<div class="tab-content">
+						{% for language in languages %}
+						<div class="tab-pane" id="language{{ language.language_id }}">
+
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="input-code-{{ language.language_id }}">{{ entry_code_block }}</label>
+								<div class="col-sm-10">
+									<pre id="input-code-{{ language.language_id }}" class="input-code"></pre>
+									<input type="hidden" name="code[{{ language.language_id }}]" id="hidden-code-{{ language.language_id }}" value="{{ code[language.language_id] }}">
+								</div>
+							</div>
+
+						</div>
+						{% endfor %}
+					</div>
+				
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.9.6/ace.min.js" integrity="sha512-U2JKYiHG3ixOjmdycNbi4Xur8q4Nv73CscCGEopBeiVyzDR5ErC6jmHNr0pOB8CUVWb0aQXLgL0wYXhoMU6iqw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+{% for language in languages %}
+let jsEditorWrapper{{ language.language_id }};
+let jsEditor{{ language.language_id }};
+{% endfor %}
+$(document).ready(function() {
+
+	window.ace.config.set('basePath', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.9.6/');
+	{% for language in languages %}
+	jsEditorWrapper{{ language.language_id }} = document.querySelector('#input-code-{{ language.language_id }}');
+	jsEditor{{ language.language_id }} = window.ace.edit(jsEditorWrapper{{ language.language_id }});
+	jsEditor{{ language.language_id }}.setTheme('ace/theme/textmate');
+	jsEditor{{ language.language_id }}.session.setMode('ace/mode/html');
+
+	jsEditor{{ language.language_id }}.setValue($('#hidden-code-{{ language.language_id }}').val(), -1);
+	jsEditor{{ language.language_id }}.focus();
+	{% endfor %}
+
+	$('#form-module').on('submit', function(e) {
+		{% for language in languages %}
+		$('#hidden-code-{{ language.language_id }}').val(jsEditor{{ language.language_id }}.getValue());
+		{% endfor %}
+		return true;
+	});
+
+	$('.switcher').on('change', function(e) {
+		$('#' + $(e.target).data('target')).val(Number($(e.target).prop('checked')));
+	});
+
+	$('#language a:first').tab('show');
+
+	$.switcher('input[type=checkbox].switcher');
+
+	$('[data-countdown]').each(function(index, value) {
+		let tid = setInterval(() => {
+			let current = parseInt($(value).find('.countdown').text().match(/(\d+)/));
+			$(value).find('.countdown').text('[' + (current - 1) + ']');
+			if (current == 1) {
+				clearInterval(tid);
+				$(value).remove();
+			}
+		}, 1000);
+	});
+
+});
+</script>
+{{ footer }}

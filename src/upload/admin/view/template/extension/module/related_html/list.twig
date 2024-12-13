@@ -1,0 +1,192 @@
+{{ header }}{{ column_left }}
+<div id="content">
+<style>
+html {
+	overflow-y: scroll;
+}
+.btn-divider {
+	display: inline-block;
+	width: 1px;
+	padding: 7px 0px;
+	margin: 0px 5px;
+	background: #cdcdcd;
+	border: none;
+}
+table > tbody > tr > td:nth-child(2) {
+	cursor: pointer;
+}
+</style>
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="pull-right">
+				<a href="{{ add_block }}" data-toggle="tooltip" title="{{ button_add }}" class="btn btn-success"><i class="fa fa-plus"></i></a>
+				<span type="button" class="btn-divider">&nbsp;</span>
+				<button type="submit" form="form-module" formaction="{{ clone }}" data-toggle="tooltip" title="{{ button_clone }}" class="btn btn-default form-action"><i class="fa fa-copy"></i></button>
+				<button type="submit" form="form-module" formaction="{{ multiple_edit }}" data-toggle="tooltip" title="{{ text_multiple }}" class="btn btn-primary form-action"><i class="fa fa-pencil"></i></button>
+				<button type="submit" form="form-module" formaction="{{ delete }}" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger form-action" disabled id="button-delete"><i class="fa fa-trash"></i></button>
+				<span type="button" class="btn-divider">&nbsp;</span>
+				<div class="btn-group" data-toggle="tooltip" title="{{ button_modules }}">
+					<a href="{{ modules_link }}" type="button" class="btn btn-success">{{ button_modules }}</a>
+					<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+						<span class="caret"></span>
+						<span class="sr-only">Toggle Dropdown</span>
+					</button>
+					<ul class="dropdown-menu dropdown-menu-right">
+						<li><a href="{{ add_module }}">{{ button_add }}</a></li>
+						{% if (modules is not empty) %}
+						<li role="separator" class="divider"></li>
+						<li class="dropdown-header">{{ button_modules }}</li>
+						{% for module in modules %}
+						<li><a href="{{ module.edit }}">{{ module.name }}</a></li>
+						{% endfor %}
+						{% endif %}
+					</ul>
+				</div>
+				<div class="btn-group" data-toggle="tooltip" title="{{ text_list }}">
+					<a href="{{ list }}" type="button" class="btn btn-success">{{ text_list }}</a>
+					<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+						<span class="caret"></span>
+						<span class="sr-only">Toggle Dropdown</span>
+					</button>
+					<ul class="dropdown-menu dropdown-menu-right">
+						<li><a href="{{ add_block }}">{{ button_add }}</a></li>
+						{% if (htmls_top is not empty) %}
+						<li role="separator" class="divider"></li>
+						<li class="dropdown-header">{{ text_list }}</li>
+						{% for html in htmls_top %}
+						<li><a href="{{ html.edit }}">{{ html.name }}</a></li>
+						{% endfor %}
+						{% endif %}
+					</ul>
+				</div>
+			</div>
+			<h1>{{ heading_title }}</h1>
+			<ul class="breadcrumb">
+				{% for breadcrumb in breadcrumbs %}
+				<li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="container-fluid">
+		{% if error_warning %}
+		<div class="alert alert-danger alert-dismissible" data-countdown><i class="fa fa-exclamation-circle"></i> <span class="countdown">[2]</span> {{ error_warning }}
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+		{% endif %}
+		{% if success %}
+		<div class="alert alert-success alert-dismissible" data-countdown><i class="fa fa-check-circle"></i> <span class="countdown">[2]</span> {{ success }}
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+		{% endif %}
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title"><i class="fa fa-list"></i> {{ text_list }}</h3><h3 class="panel-title pull-right">v{{ version }}</h3>
+			</div>
+			<div class="panel-body">
+				<form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+					<div class="table-responsive">
+						<table class="table table-bordered table-hover">
+							<thead>
+								<tr>
+									<td style="width: 1px;" class="text-center"><input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></td>
+									<td class="text-left">{% if sort == 'name' %}<a href="{{ sort_name }}" class="{{ order|lower }}">{{ column_name }}</a>{% else %}<a href="{{ sort_name }}">{{ column_name }}</a>{% endif %}</td>
+									<td class="text-left">{% if sort == 'sort_order' %}<a href="{{ sort_sort_order }}" class="{{ order|lower }}">{{ column_sort_order }}</a>{% else %}<a href="{{ sort_sort_order }}">{{ column_sort_order }}</a>{% endif %}</td>
+									<td class="text-left">{% if sort == 'date_added' %}<a href="{{ sort_date_added }}" class="{{ order|lower }}">{{ column_date_added }}</a>{% else %}<a href="{{ sort_date_added }}">{{ column_date_added }}</a>{% endif %}</td>
+									<td class="text-left">{% if sort == 'date_edited' %}<a href="{{ sort_date_edited }}" class="{{ order|lower }}">{{ column_date_edited }}</a>{% else %}<a href="{{ sort_date_edited }}">{{ column_date_edited }}</a>{% endif %}</td>
+									<td class="text-left" width="1">{{ column_status }}</td>
+									<td class="text-right" width="1">{{ column_action }}</td>
+								</tr>
+							</thead>
+							<tbody>
+								{% if htmls %}
+								{% for html in htmls %}
+								<tr>
+									<td class="text-center">{% if html.html_id in selected %}
+										<input type="checkbox" name="selected[]" value="{{ html.html_id }}" checked="checked" />
+										{% else %}
+										<input type="checkbox" name="selected[]" value="{{ html.html_id }}" />
+										{% endif %}</td>
+									<td class="text-left">{{ html.name }}</td>
+									<td class="text-left">{{ html.sort_order }}</td>
+									<td class="text-left">{{ html.date_added }}</td>
+									<td class="text-left">{{ html.date_edited }}</td>
+									<td class="text-left">
+										<input type="checkbox" class="switcher ui-switcher" value="{{ html.html_id }}" {{ (html.status == 1) ? 'checked' : '' }}>
+									</td>
+									<td class="text-right">
+										<a href="{{ html.edit }}" data-toggle="tooltip" title="{{ button_edit }}" class="btn btn-primary"><i class="fa fa-pencil"></i></a>
+									</td>
+								</tr>
+								{% endfor %}
+								{% else %}
+								<tr>
+									<td class="text-center" colspan="5">{{ text_no_results }}</td>
+								</tr>
+								{% endif %}
+							</tbody>
+						</table>
+					</div>
+				</form>
+				<div class="row">
+					<div class="col-sm-6 text-left">{{ pagination }}</div>
+					<div class="col-sm-6 text-right">{{ results }}</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+$(document).ready(function() {
+
+	$('table > tbody > tr > td:nth-child(2)').on('click', function() {
+		let $checkbox = $(this).parent('tr').find('input[type=checkbox]');
+		$checkbox.prop('checked', !$checkbox.prop('checked'));
+	});
+
+	$('.form-action').on('click', function(e) {
+		$('#form-module').attr('action', $(this).attr('formaction')).submit();
+	});
+
+	$('.switcher').on('change', function(e) {
+		let html_id = $(e.target).val();
+		let value = $(e.target).prop('checked');
+		$.ajax({
+			type: "POST",
+			url: "{{ change_status }}",
+			data: {
+				html_id: html_id,
+				value: Number(value)
+			},
+			dataType: "json",
+			success: function (response) {
+				console.log(response);
+			}
+		});
+	});
+
+	$('#form-module input[type="checkbox"]').click(function(event) {
+		var checked = $('input[type="checkbox"][name^="selected"]:checked').length;
+		if (checked >= 1) {
+			$('#button-delete').attr('disabled', false);
+		}else{
+			$('#button-delete').attr('disabled', true);
+		}
+	});
+
+	$.switcher('input[type=checkbox].switcher');
+
+	$('[data-countdown]').each(function(index, value) {
+		let tid = setInterval(() => {
+			let current = parseInt($(value).find('.countdown').text().match(/(\d+)/));
+			$(value).find('.countdown').text('[' + (current - 1) + ']');
+			if (current == 1) {
+				clearInterval(tid);
+				$(value).remove();
+			}
+		}, 1000);
+	});
+
+});
+</script>
+{{ footer }}
