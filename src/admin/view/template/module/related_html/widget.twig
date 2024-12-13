@@ -1,0 +1,27 @@
+<style>
+html {
+	overflow-y: scroll;
+}
+</style>
+
+<script>
+function invertSelection(sender) {
+	$.each($(sender).closest('.row').find('input[type=checkbox]'), function(index, value){
+		$(value).prop('checked', !$(value).prop('checked'));
+	});
+}
+</script>
+
+<div class="row mb-3 related_html_widget">
+	<label class="col-sm-2 col-form-label" for="input-process-status"><span data-bs-toggle="tooltip" title="{{ entry_related_html_help }}">{{ entry_related_html }}</span></label>
+	<div class="col-sm-10">
+		<div class="form-control" style="height: 150px; overflow: auto;">
+		{% for html in htmls %}
+			<div class="form-check">
+				<input type="checkbox" name="related_htmls[]" value="{{ html.html_id }}" id="input-html-{{ html.html_id }}" class="form-check-input"{% if html.html_id in related_htmls %} checked{% endif %}/> <label for="input-html-{{ html.html_id }}" class="form-check-label">{{ html.name }}</label>
+			</div>
+		{% endfor %}
+		</div>
+		<a href="#" onclick="$(this).parent().find(':checkbox').prop('checked', true);return false;">{{ text_select_all }}</a> / <a href="#" onclick="$(this).parent().find(':checkbox').prop('checked', false);return false;">{{ text_unselect_all }}</a> / <a href="#" onclick="invertSelection(this);return false;">{{ text_invert_selection }}</a> / <a href="{{ add }}" target="_blank">{{ text_add }}</a>
+	</div>
+</div>

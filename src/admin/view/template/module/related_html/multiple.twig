@@ -1,0 +1,206 @@
+{{ header }}{{ column_left }}
+<div id="content">
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="float-end">
+				<button type="submit" form="form-module" data-bs-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+				<a href="{{ list }}" data-bs-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-secondary"><i class="fa fa-reply"></i></a>
+				<span type="button" class="btn-divider">&nbsp;</span>
+				<div class="btn-group" data-bs-toggle="tooltip" title="{{ button_modules }}">
+					<a href="{{ modules_link }}" class="btn btn-success">{{ button_modules }}</a>
+					<button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+						<span class="visually-hidden">Toggle Dropdown</span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a class="dropdown-item" href="{{ add_module }}">{{ button_add }}</a></li>
+						{% if (modules is not empty) %}
+						<li><hr class="dropdown-divider"></li>
+						<li><h6 class="dropdown-header">{{ button_modules }}</h6></li>
+						{% for module in modules %}
+						<li><a class="dropdown-item" href="{{ module.edit }}">{{ module.name }}</a></li>
+						{% endfor %}
+						{% endif %}
+					</ul>
+				</div>
+				<div class="btn-group" data-bs-toggle="tooltip" title="{{ text_list }}">
+					<a href="{{ list }}" class="btn btn-success">{{ text_list }}</a>
+					<button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+						<span class="visually-hidden">Toggle Dropdown</span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a class="dropdown-item" href="{{ add_block }}">{{ button_add }}</a></li>
+						{% if (htmls_top is not empty) %}
+						<li><hr class="dropdown-divider"></li>
+						<li><h6 class="dropdown-header">{{ text_list }}</h6></li>
+						{% for html in htmls_top %}
+						<li><a class="dropdown-item" href="{{ html.edit }}">{{ html.name }}</a></li>
+						{% endfor %}
+						{% endif %}
+					</ul>
+				</div>
+			</div>
+			<h1>{{ heading_title }}</h1>
+			<ol class="breadcrumb">
+				{% for breadcrumb in breadcrumbs %}
+					<li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+				{% endfor %}
+			</ol>
+		</div>
+	</div>
+	<div class="container-fluid">
+		{% if error_warning %}
+			<div class="alert alert-danger alert-dismissible"><i class="fas fa-exclamation-circle"></i> {{ error_warning }}
+				<button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+			</div>
+		{% endif %}
+		{% if success %}
+		<div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ success }}
+			<button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		{% endif %}
+		<style>
+		html {
+			overflow-y: scroll;
+		}
+		.input-code {
+			min-height: 250px;
+		}
+		.btn-divider {
+			display: inline-block;
+			width: 1px;
+			padding: 7px 0px;
+			margin: 0px 5px;
+			background: #cdcdcd;
+			border: none;
+		}
+		.ui-switcher {
+			margin-top: 9px;
+		}
+		#content .dropdown-toggle::after {
+			display: inline-block;
+			vertical-align: 0.155em;
+			content: "";
+			border-top: 0.355em solid;
+			border-right: 0.355em solid transparent;
+			border-bottom: 0;
+			border-left: 0.355em solid transparent;
+		}
+		</style>
+		<div class="card">
+			<div class="card-header"><i class="fas fa-list"></i> {{ text_multiple }}<span class="float-end">v{{ version }}</span></div>
+			<div class="card-body">
+				<div class="menu-manager-container">
+					<form action="{{ save }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+						{% if htmls is not empty %}
+						{% for html in htmls %}
+
+							<input type="hidden" name="htmls[{{ html.html_id }}][html_id]" value="{{ html.html_id }}">
+
+							<fieldset>
+								<legend>{{ html.name }}</legend>
+
+								<div class="row mb-3 required">
+									<label class="col-sm-2 col-form-label" for="input-name{{ html.html_id }}">{{ entry_name }}</label>
+									<div class="col-sm-10">
+										<input type="text" name="htmls[{{ html.html_id }}][name]" id="input-name{{ html.html_id }}" class="form-control" value="{{ html.name }}" placeholder="{{ entry_name }}">
+										{% if error_name[html.html_id] is defined %}
+											<div class="invalid-feedback d-block">{{ error_name[html.html_id] }}</div>
+										{% endif %}
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<label class="col-sm-2 col-form-label" for="input-sort-order{{ html.html_id }}">{{ entry_sort_order }}</label>
+									<div class="col-sm-10">
+										<input type="text" name="htmls[{{ html.html_id }}][sort_order]" id="input-sort-order{{ html.html_id }}" class="form-control" value="{{ html.sort_order }}" placeholder="{{ entry_sort_order }}">
+									</div>
+								</div>
+
+								<ul class="nav nav-tabs" id="language{{ html.html_id }}" role="tablist">
+									{% for language in languages %}
+									<li class="nav-item" role="presentation">
+										<a href="#language{{ html.html_id }}-{{ language.language_id }}" data-bs-toggle="tab" class="nav-link">
+											<img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /> {{ language.name }}
+										</a>
+									</li>
+									{% endfor %}
+								</ul>
+
+								<div class="tab-content">
+									{% for language in languages %}
+									<div class="tab-pane" id="language{{ html.html_id }}-{{ language.language_id }}">
+
+										<div class="row mb-3">
+											<label class="col-sm-2 col-form-label" for="input-code-{{ html.html_id }}-{{ language.language_id }}">{{ entry_code_block }}</label>
+											<div class="col-sm-10">
+												<pre id="input-code-{{ html.html_id }}-{{ language.language_id }}" class="input-code"></pre>
+												<input type="hidden" name="htmls[{{ html.html_id }}][code][{{ language.language_id }}]" id="hidden-code-{{ html.html_id }}-{{ language.language_id }}" value="{{ html.code[language.language_id] }}">
+											</div>
+										</div>
+
+									</div>
+									{% endfor %}
+								</div>
+
+							</fieldset>
+
+						{% endfor %}
+						{% else %}
+							<div class="text-center">{{ text_no_results }}</div>
+						{% endif %}
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.9.6/ace.min.js" integrity="sha512-U2JKYiHG3ixOjmdycNbi4Xur8q4Nv73CscCGEopBeiVyzDR5ErC6jmHNr0pOB8CUVWb0aQXLgL0wYXhoMU6iqw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+{% for html in htmls %}
+{% for language in languages %}
+let jsEditorWrapper_{{ html.html_id }}_{{ language.language_id }};
+let jsEditor_{{ html.html_id }}_{{ language.language_id }};
+{% endfor %}
+{% endfor %}
+$(document).ready(function() {
+
+	{% for html in htmls %}
+	$('#language{{ html.html_id }} a:first').tab('show');
+	{% endfor %}
+
+	window.ace.config.set('basePath', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.9.6/');
+	{% for html in htmls %}
+	{% for language in languages %}
+	jsEditorWrapper_{{ html.html_id }}_{{ language.language_id }} = document.querySelector('#input-code-{{ html.html_id }}-{{ language.language_id }}');
+	jsEditor_{{ html.html_id }}_{{ language.language_id }} = window.ace.edit(jsEditorWrapper_{{ html.html_id }}_{{ language.language_id }});
+	jsEditor_{{ html.html_id }}_{{ language.language_id }}.setTheme('ace/theme/textmate');
+	jsEditor_{{ html.html_id }}_{{ language.language_id }}.session.setMode('ace/mode/html');
+
+	jsEditor_{{ html.html_id }}_{{ language.language_id }}.setValue($('#hidden-code-{{ html.html_id }}-{{ language.language_id }}').val(), -1);
+	jsEditor_{{ html.html_id }}_{{ language.language_id }}.focus();
+	{% endfor %}
+	{% endfor %}
+
+	$('#form-module').on('submit', function(e) {
+		{% for html in htmls %}
+		{% for language in languages %}
+		$('#hidden-code-{{ html.html_id }}-{{ language.language_id }}').val(jsEditor_{{ html.html_id }}_{{ language.language_id }}.getValue());
+		{% endfor %}
+		{% endfor %}
+		return true;
+	});
+
+	$('[data-countdown]').each(function(index, value) {
+		let tid = setInterval(() => {
+			let current = parseInt($(value).find('.countdown').text().match(/(\d+)/));
+			$(value).find('.countdown').text('[' + (current - 1) + ']');
+			if (current == 1) {
+				clearInterval(tid);
+				$(value).remove();
+			}
+		}, 1000);
+	});
+
+});
+</script>
+{{ footer }}
